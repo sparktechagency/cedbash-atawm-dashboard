@@ -1,0 +1,97 @@
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import "tailwindcss";
+
+@import "swiper/css";
+@import "swiper/css/effect-fade";
+@import "swiper/css/pagination";
+@import "swiper/css/navigation";
+
+@layer components {
+  .text-gradient-color {
+    @apply !bg-gradient-to-b from-[#FF9815] to-[#5A8ED2] !inline-block !text-transparent !bg-clip-text;
+  }
+  .bg-gradient-color {
+    @apply !bg-gradient-to-b from-[#FF9815] to-[#5A8ED2];
+  }
+}
+
+@theme default {
+  --color-primary-color: #ffffff;
+  --color-background-color: #ffffff;
+  --color-secondary-color: #ff9815;
+  --color-base-color: #47586e;
+  --color-anchor-color: #8a8d8e;
+  --color-highlight-color: #fff0dc;
+  --color-lighter-color: #797979;
+  --color-input-color: #3a3a3a;
+  --color-error-color: #e53935;
+  --color-success-color: #00c566;
+  --color-warning-color: #facc15;
+}
+
+html,
+body {
+  background-color: #ffffff;
+  color: #111111;
+  scroll-behavior: smooth;
+  font-family: "Outfit", sans-serif;
+}
+
+/* .font-special {
+  font-family: var(--font-bagatelleVF);
+} */
+
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(45deg, #ff9815, #ff9815);
+  margin-left: 2px;
+  margin-right: 2px;
+  border-radius: 0px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #ffffff;
+}
+
+.swiper-pagination-bullet {
+  width: 15px !important;
+  height: 15px !important;
+  background-color: #0066cc !important;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/** SIDEBAR:  Selected Backgorund Color Change  */
+
+.ant-menu-submenu-selected .ant-menu-submenu-title {
+  background-color: #ff9815 !important;
+  color: #ffffff !important;
+}
+
+.ant-menu-submenu-selected .ant-menu-item-icon {
+  background-color: #ff9815 !important;
+}
+.ant-menu-submenu-selected .ant-menu-item-selected {
+  background-color: transparent !important;
+}
+.ant-menu-submenu-selected .ant-menu-item-selected a {
+  color: #ff9815 !important;
+}
+.ant-menu-submenu-selected .ant-menu-item-selected .ant-menu-item-icon {
+  color: #ff9815 !important;
+}
+
+th {
+  border-bottom: 2px solid #ff9815 !important;
+}
+
+.ant-table-filter-column .active {
+  background-color: #ffffff !important;
+}
