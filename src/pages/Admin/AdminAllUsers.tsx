@@ -1,19 +1,30 @@
 import { useState } from "react";
-import { UserData } from "../../../public/data/Users";
 import SearchInput from "../../ui/Form/ReuseSearchInput";
 import AdminAllUsersTable from "../../ui/Tables/AdminAllUsersTable";
 import AdminViewUsersModal from "../../ui/Modal/Users/AdminViewUsers";
 import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
-import { IUser } from "../../types/userTypes";
+import {
+  useActionUserMutation,
+  useGetAllUserQuery,
+} from "../../redux/features/users/usersApi";
+import { IUser } from "../../types";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const AdminAllUsers = () => {
-  const data = UserData;
+  const [userAction] = useActionUserMutation();
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
-
   const limit = 12;
+
+  const { data, isFetching } = useGetAllUserQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const totalData = data?.data?.meta?.total;
+  const users = data?.data?.users;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
@@ -41,11 +52,29 @@ const AdminAllUsers = () => {
     setCurrentRecord(null);
   };
 
-  const handleBlock = (data: IUser) => {
-    console.log(data);
+  const handleBlock = async (data: IUser) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        params: data?._id,
+      },
+      "Blocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
-  const handleUnblock = (data: IUser) => {
-    console.log(data);
+  const handleUnblock = async (data: IUser) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        params: data?._id,
+      },
+      "Unblocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
   return (
     <div>
@@ -66,14 +95,14 @@ const AdminAllUsers = () => {
         </div>
 
         <AdminAllUsersTable
-          data={data}
-          loading={false}
+          data={users}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={totalData}
           limit={limit}
         />
         <AdminViewUsersModal

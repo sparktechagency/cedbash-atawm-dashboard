@@ -1,6 +1,8 @@
 import { Modal } from "antd";
 import { AllImages } from "../../../../public/images/AllImages";
-import { IUser } from "../../../types/userTypes";
+import { IUser } from "../../../types";
+import { getImageUrl } from "../../../helpers/config/envConfig";
+import { formatDate } from "../../../utils/dateFormet";
 interface AdminViewUsersModalProps {
   isUserViewModalVisible: boolean;
   handleCancel: () => void;
@@ -11,6 +13,7 @@ const AdminViewUsersModal: React.FC<AdminViewUsersModalProps> = ({
   handleCancel,
   currentRecord,
 }) => {
+  const serverUrl = getImageUrl();
   return (
     <Modal
       open={isUserViewModalVisible}
@@ -27,10 +30,14 @@ const AdminViewUsersModal: React.FC<AdminViewUsersModalProps> = ({
           <p className="text-sm sm:text-base lg:text-lg text-center mt-2 text-[#989898]">
             See all details about {currentRecord?.fullName}
           </p>
-          <div className="flex justify-center items-center gap-2 mt-5">
+          <div className="flex flex-col justify-center items-center gap-2 mt-5">
             {/* Avatar */}
             <img
-              src={AllImages.profile}
+              src={
+                (currentRecord?.profileImage?.length as number) > 0
+                  ? serverUrl + currentRecord?.profileImage
+                  : AllImages.profile
+              }
               alt={currentRecord?.fullName}
               className="w-16 h-16 object-cover rounded"
             />
@@ -62,11 +69,15 @@ const AdminViewUsersModal: React.FC<AdminViewUsersModalProps> = ({
               </div>
               <div className="flex items-center  gap-2 mb-2">
                 <span className="font-medium">Address:</span>
-                <span>Dhaka, Bangladesh</span>
+                <span>{currentRecord?.address}</span>
+              </div>
+              <div className="flex items-center  gap-2 mb-2">
+                <span className="font-medium">Date of Birth:</span>
+                <span>{formatDate(currentRecord?.dob as string)}</span>
               </div>
               <div className="flex items-center  gap-2 mb-2">
                 <span className="font-medium">Joining Date:</span>
-                <span>26 Feb 2001</span>
+                <span>{formatDate(currentRecord?.createdAt)}</span>
               </div>
             </div>
           </div>

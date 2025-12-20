@@ -4,8 +4,11 @@ import { Space, Tooltip } from "antd";
 import { MdBlock } from "react-icons/md";
 import { GoEye } from "react-icons/go";
 import { ColumnsType } from "antd/es/table";
-import { IUser } from "../../types/userTypes";
 import { AllImages } from "../../../public/images/AllImages";
+import { IUser } from "../../types";
+import { getImageUrl } from "../../helpers/config/envConfig";
+import { formatDate } from "../../utils/dateFormet";
+import { CgUnblock } from "react-icons/cg";
 
 interface AdminAllUsersTableProps {
   data: IUser[];
@@ -14,9 +17,9 @@ interface AdminAllUsersTableProps {
   showViewModal: (record: IUser) => void;
   showBlockModal: (record: IUser) => void;
   showUnblockModal: (record: IUser) => void;
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const AdminAllUsersTable: React.FC<AdminAllUsersTableProps> = ({
@@ -25,12 +28,20 @@ const AdminAllUsersTable: React.FC<AdminAllUsersTableProps> = ({
   setPage,
   showViewModal,
   showBlockModal,
-  // showUnblockModal,
+  showUnblockModal,
   page,
   total,
   limit,
 }) => {
+  const serverUrl = getImageUrl();
   const columns: ColumnsType<IUser> = [
+    {
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
+    },
     {
       title: "Full Name",
       dataIndex: "fullName",
@@ -38,11 +49,15 @@ const AdminAllUsersTable: React.FC<AdminAllUsersTableProps> = ({
       render: (text: string, record: IUser) => (
         <div className="flex items-center gap-3">
           <img
-            src={AllImages.profile}
+            src={
+              record?.profileImage?.length > 0
+                ? serverUrl + record?.profileImage
+                : AllImages.profile
+            }
             alt={text}
             className="w-10 h-10 rounded-full object-cover"
           />
-          <span>{record.fullName}</span>
+          <span>{record?.fullName}</span>
         </div>
       ),
     },
@@ -58,8 +73,9 @@ const AdminAllUsersTable: React.FC<AdminAllUsersTableProps> = ({
     },
     {
       title: "Joining Date",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (val) => formatDate(val),
     },
 
     {
@@ -77,24 +93,25 @@ const AdminAllUsersTable: React.FC<AdminAllUsersTableProps> = ({
               </button>
             </Tooltip>
             {/* Block User Tooltip */}
-            {/* <Tooltip placement="left" title="Unblock this User">
+            {record?.isBlocked ? (
+              <Tooltip placement="left" title="Unblock this User">
                 <button
                   className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
                   onClick={() => showUnblockModal(record)}
                 >
                   <CgUnblock style={{ fontSize: "24px" }} />
                 </button>
-              </Tooltip> */}
-
-            <Tooltip placement="left" title="Block this User">
-              <button
-                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-                onClick={() => showBlockModal(record)}
-              >
-                <MdBlock style={{ fontSize: "24px" }} />
-              </button>
-            </Tooltip>
-            {/* View Details Tooltip */}
+              </Tooltip>
+            ) : (
+              <Tooltip placement="left" title="Block this User">
+                <button
+                  className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                  onClick={() => showBlockModal(record)}
+                >
+                  <MdBlock style={{ fontSize: "24px" }} />
+                </button>
+              </Tooltip>
+            )}
           </Space>
         </>
       ),
@@ -112,7 +129,7 @@ const AdminAllUsersTable: React.FC<AdminAllUsersTableProps> = ({
       total={total}
       limit={limit}
       page={page}
-      keyValue={"email"}
+      keyValue={"_id"}
     />
   );
 };

@@ -5,7 +5,7 @@ const userApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     getAllUser: builder.query({
       query: ({ page, limit, searchTerm }) => ({
-        url: `/dashboard/all-users`,
+        url: `/dashboard/users/all-users-get-by-admin`,
         method: "GET",
         params: { page, limit, searchTerm },
       }),
@@ -13,7 +13,7 @@ const userApi = baseApi.injectEndpoints({
     }),
     actionUser: builder.mutation({
       query: (req) => ({
-        url: `/users/block/${req.params}`,
+        url: `/admin/block/${req.params}`,
         method: "PATCH",
       }),
       invalidatesTags: [tagTypes.user],
