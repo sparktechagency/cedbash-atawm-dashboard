@@ -4,6 +4,9 @@ import ReuseTable from "../../utils/ReuseTable";
 import { Space, Tag, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import { ColumnsType } from "antd/es/table";
+import { getImageUrl } from "../../helpers/config/envConfig";
+import { AllImages } from "../../../public/images/AllImages";
+import { ITransaction } from "../../types";
 
 interface AdminAllWithdrawTableProps {
   data: any[];
@@ -12,9 +15,9 @@ interface AdminAllWithdrawTableProps {
   showViewModal: (record: any) => void;
   showRejectModal: (record: any) => void;
   showAcceptModal: (record: any) => void;
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const statusColors: Record<string, string> = {
@@ -35,20 +38,42 @@ const AdminAllWithdrawTable: React.FC<AdminAllWithdrawTableProps> = ({
   total,
   limit,
 }) => {
+  const serverUrl = getImageUrl();
   const columns: ColumnsType<any> = [
     {
-      title: "#SI",
-      dataIndex: "id",
-      key: "id",
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Name",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: ["vendorId", "fullName"],
+      key: "vendorId",
+      render: (text: string, record: ITransaction) => (
+        <div className="flex items-center gap-3">
+          <img
+            src={
+              record?.vendorId?.profileImage?.length > 0
+                ? serverUrl + record?.vendorId?.profileImage
+                : AllImages.profile
+            }
+            alt={text}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <span>{record?.vendorId?.fullName}</span>
+        </div>
+      ),
+    },
+    {
+      title: "Email",
+      dataIndex: ["vendorId", "email"],
+      key: "email",
     },
     {
       title: "Role",
-      dataIndex: "role",
+      dataIndex: ["vendorId", "role"],
       key: "role",
     },
     {
@@ -56,17 +81,10 @@ const AdminAllWithdrawTable: React.FC<AdminAllWithdrawTableProps> = ({
       dataIndex: "paymentMethod",
       key: "paymentMethod",
     },
-
-    {
-      title: "Processing Fee",
-      dataIndex: "processingFee",
-      key: "processingFee",
-      render: () => `20%`,
-    },
     {
       title: "Status",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "forWithdrawStatus",
+      key: "forWithdrawStatus",
       render: (status) => (
         <Tag
           className="!capitalize !text-base"
@@ -76,13 +94,6 @@ const AdminAllWithdrawTable: React.FC<AdminAllWithdrawTableProps> = ({
           {status}
         </Tag>
       ),
-      filters: [
-        { text: "Pending", value: "pending" },
-        { text: "Processing", value: "processing" },
-        { text: "Completed", value: "completed" },
-        { text: "Failed", value: "failed" },
-      ],
-      onFilter: (value, record) => record.status === value,
     },
     {
       title: "Payment Information",

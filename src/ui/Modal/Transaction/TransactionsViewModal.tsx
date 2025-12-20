@@ -1,11 +1,12 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Modal } from "antd";
+import { IEarning } from "../../../types";
+import { formatDate } from "../../../utils/dateFormet";
 
 interface TransactionsViewModalProps {
   isViewModalVisible: boolean;
   handleCancel: () => void;
-  currentRecord: any | null;
+  currentRecord: IEarning | null;
 }
 
 const TransactionsViewModal: React.FC<TransactionsViewModalProps> = ({
@@ -29,43 +30,34 @@ const TransactionsViewModal: React.FC<TransactionsViewModalProps> = ({
       <div className="py-5">
         <div className="text-lg text-center font-medium ">
           <div className="flex justify-start items-center gap-2 mb-2">
-            <div className="font-bold text-base-color">Seller name :</div>
-            <div>{currentRecord?.name}</div>
+            <div className="font-bold text-base-color">Vendor name :</div>
+            <div>{currentRecord?.vendorId?.fullName}</div>
           </div>
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Transaction ID:</div>
-            <div className="text-justify pt-0">TXN012301</div>
+            <div className="text-justify pt-0">
+              {currentRecord?.paymentId?.paymentInfo?.stripePaymentIntentId}
+            </div>
           </div>
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Date: </div>
-            <div className="text-base-color">{currentRecord?.date}</div>
-          </div>
-          <div className="flex justify-start items-center gap-2 mb-2">
-            <div className="font-bold text-base-color">A/C No: </div>
-            <div className="text-base-color">**** **** **** 1234</div>
+            <div className="text-base-color">
+              {formatDate(currentRecord?.createdAt)}
+            </div>
           </div>
 
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">
               Transaction amount :
             </div>
-            <div className="text-justify pt-0">{currentRecord?.amount}</div>
+            <div className="text-justify pt-0">
+              {currentRecord?.serviceAmount}
+            </div>
           </div>
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Commission :</div>
-            <div className="text-justify pt-0">{currentRecord?.commission}</div>
-          </div>
-
-          <div className="flex justify-start items-center gap-2 mb-2">
-            <div className="font-bold text-base-color">Status:</div>
             <div className="text-justify pt-0">
-              {currentRecord?.Status === "Pending" ? (
-                <span className="text-error-color">
-                  {currentRecord?.Status}
-                </span>
-              ) : (
-                <span className="text-success-color">Completed</span>
-              )}
+              {currentRecord?.adminAmount}
             </div>
           </div>
         </div>

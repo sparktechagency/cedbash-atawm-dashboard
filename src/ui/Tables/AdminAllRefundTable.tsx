@@ -3,6 +3,7 @@ import { Space, Tag, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
 import { ColumnsType } from "antd/es/table";
+import { formatDate } from "../../utils/dateFormet";
 
 interface AdminAllRefundTableProps {
   data: any[];
@@ -31,41 +32,49 @@ const AdminAllRefundTable: React.FC<AdminAllRefundTableProps> = ({
   };
   const columns: ColumnsType<any> = [
     {
-      title: "#SI",
-      dataIndex: "id",
-      key: "id",
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Name",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: ["userId", "fullName"],
+      key: "fullName",
     },
     {
       title: "Email",
-      dataIndex: "email",
+      dataIndex: ["userId", "email"],
       key: "email",
     },
     {
       title: "Price",
-      dataIndex: "price",
-      key: "price",
+      dataIndex: "refundedAmount",
+      key: "refundedAmount",
       render: (val) => `$${val.toFixed(2)}`,
     },
     {
       title: "Role",
-      dataIndex: "roles",
-      key: "roles",
+      dataIndex: "refundedBy",
+      key: "refundedBy",
     },
     {
       title: "Reason",
-      dataIndex: "reason",
-      key: "reason",
+      dataIndex: "refundReason",
+      key: "refundReason",
       ellipsis: true,
     },
     {
+      title: "Request Date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (val) => formatDate(val),
+    },
+    {
       title: "Status",
-      dataIndex: "status",
-      key: "status",
+      dataIndex: "refundStatus",
+      key: "refundStatus",
       render: (status) => (
         <Tag
           className="!text-base"
@@ -75,11 +84,6 @@ const AdminAllRefundTable: React.FC<AdminAllRefundTableProps> = ({
           {status}
         </Tag>
       ),
-      filters: [
-        { text: "Pending", value: "pending" },
-        { text: "Accept", value: "accept" },
-        { text: "Reject", value: "reject" },
-      ],
     },
     {
       title: "Action",

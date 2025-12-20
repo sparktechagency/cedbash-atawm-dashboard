@@ -3,7 +3,7 @@ interface IJwtPayload {
   email: string;
   phone: string;
   userId: string;
-  role: "super_admin" | string;
+  role: "super_admin" | "admin" | string;
   iat: number;
   exp: number;
 }

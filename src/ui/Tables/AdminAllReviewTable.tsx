@@ -1,13 +1,15 @@
 import { Rate, Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
-import { ReviewType } from "../../types/ReviewType";
+import { IFeedback } from "../../types";
+import { AllImages } from "../../../public/images/AllImages";
+import { getImageUrl } from "../../helpers/config/envConfig";
 
 interface AdminAllReviewTableProps {
-  data: ReviewType[];
+  data: IFeedback[];
   loading: boolean;
-  showViewModal: (record: ReviewType) => void;
-  showDeleteModal: (record: ReviewType) => void;
+  showViewModal: (record: IFeedback) => void;
+  showDeleteModal: (record: IFeedback) => void;
   setPage: (page: number) => void;
   page: number;
   total: number;
@@ -24,6 +26,7 @@ const AdminAllReviewTable: React.FC<AdminAllReviewTableProps> = ({
   total,
   limit,
 }) => {
+  const serverUrl = getImageUrl();
   const columns = [
     {
       title: "#UID",
@@ -32,29 +35,57 @@ const AdminAllReviewTable: React.FC<AdminAllReviewTableProps> = ({
     },
     {
       title: "User Name",
-      dataIndex: "fullName", // Data key for fullName
-      key: "fullName",
+      dataIndex: "ratee", // Data key for ratee
+      key: "ratee",
+      render: (text: string, record: IFeedback) => (
+        <div className="flex items-center gap-3">
+          <img
+            src={
+              (record?.rater?.profileImage?.length as number) > 0
+                ? serverUrl + record?.rater?.profileImage
+                : AllImages.profile
+            }
+            alt={text}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <span>{record?.rater?.fullName}</span>
+        </div>
+      ),
     },
 
     {
       title: "User Email",
-      dataIndex: "email", // Data key for email
+      dataIndex: ["rater", "email"], // Data key for email
       key: "email",
     },
     {
       title: "Vendor Name",
-      dataIndex: "fullName", // Data key for fullName
-      key: "fullName",
+      dataIndex: "ratee", // Data key for ratee
+      key: "ratee",
+      render: (text: string, record: IFeedback) => (
+        <div className="flex items-center gap-3">
+          <img
+            src={
+              record?.ratee?.profileImage?.length > 0
+                ? serverUrl + record?.ratee?.profileImage
+                : AllImages.profile
+            }
+            alt={text}
+            className="w-10 h-10 rounded-full object-cover"
+          />
+          <span>{record?.ratee?.fullName}</span>
+        </div>
+      ),
     },
     {
       title: "Vendor Email",
-      dataIndex: "email", // Data key for email
+      dataIndex: ["ratee", "email"], // Data key for email
       key: "email",
     },
     {
       title: "Date",
-      dataIndex: "date", // Data key for date
-      key: "date",
+      dataIndex: "createdAt", // Data key for createdAt
+      key: "createdAt",
     },
     {
       title: "Rating",
@@ -74,16 +105,18 @@ const AdminAllReviewTable: React.FC<AdminAllReviewTableProps> = ({
     },
     {
       title: "Review",
-      dataIndex: "review", // Data key for review
-      key: "review",
+      dataIndex: "comment", // Data key for comment
+      key: "comment",
       render: (text: string) => (
-        <div className="max-w-[200px] truncate">{text.slice(0, 100)}</div>
+        <div className="max-w-[200px] truncate">
+          {text.slice(0, 50) + (text.length > 50 ? "..." : "")}
+        </div>
       ),
     },
     {
       title: "Action",
       key: "action",
-      render: (_: unknown, record: ReviewType) => (
+      render: (_: unknown, record: IFeedback) => (
         <Space size="middle">
           {/* View Details Tooltip */}
           <Tooltip placement="right" title="View Details">

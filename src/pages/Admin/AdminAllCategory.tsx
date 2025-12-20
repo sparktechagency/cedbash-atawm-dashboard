@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import DeleteModal from "../../ui/Modal/DeleteModal";
@@ -12,10 +11,11 @@ import { getImageUrl } from "../../helpers/config/envConfig";
 import { ICategory } from "../../types";
 import { AllImages } from "../../../public/images/AllImages";
 import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import Loading from "../../ui/Loading";
 
 const AdminAllCategory = () => {
   const serverUrl = getImageUrl();
-  const { data } = useGetAllCategoryQuery({});
+  const { data, isFetching } = useGetAllCategoryQuery({});
   const [deleteCategory] = useDeleteCategoryMutation({});
 
   const allCategories: ICategory[] = data?.data;
@@ -52,7 +52,7 @@ const AdminAllCategory = () => {
       {
         params: data?._id,
       },
-      "Blocking..."
+      "Deleting..."
     );
     if (res.statusCode === 200) {
       handleCancel();
@@ -76,41 +76,45 @@ const AdminAllCategory = () => {
           </div>
         </div>
         <div className="mt-10 flex items-center gap-5 flex-wrap px-5">
-          {allCategories?.map((item) => (
-            <div
-              className="flex flex-col items-center gap-2 bg-[#F5F5F5] p-5 rounded-2xl"
-              key={item?._id}
-            >
-              <img
-                src={
-                  item?.image?.length > 0
-                    ? serverUrl + item?.image
-                    : AllImages?.defaultCover
-                }
-                alt="category"
-                className="w-16 h-auto"
-              />
-              <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-secondary-color">
-                {item?.categoryName}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <ReuseButton
-                  variant="outline"
-                  className="!text-base !px-4 !py-3"
-                  onClick={() => showEditModal(item)}
-                >
-                  Edit
-                </ReuseButton>
-                <ReuseButton
-                  variant="error"
-                  className="!text-base !px-4 !py-3"
-                  onClick={() => showDeleteModal(item)}
-                >
-                  Delete
-                </ReuseButton>
+          {isFetching ? (
+            <Loading />
+          ) : (
+            allCategories?.map((item) => (
+              <div
+                className="flex flex-col items-center gap-2 bg-[#F5F5F5] p-5 rounded-2xl"
+                key={item?._id}
+              >
+                <img
+                  src={
+                    item?.image?.length > 0
+                      ? serverUrl + item?.image
+                      : AllImages?.defaultCover
+                  }
+                  alt="category"
+                  className="w-16 h-auto"
+                />
+                <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-secondary-color">
+                  {item?.categoryName}
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <ReuseButton
+                    variant="outline"
+                    className="!text-base !px-4 !py-3"
+                    onClick={() => showEditModal(item)}
+                  >
+                    Edit
+                  </ReuseButton>
+                  <ReuseButton
+                    variant="error"
+                    className="!text-base !px-4 !py-3"
+                    onClick={() => showDeleteModal(item)}
+                  >
+                    Delete
+                  </ReuseButton>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         <AddCategory
           isAddModalVisible={isAddModalVisible}

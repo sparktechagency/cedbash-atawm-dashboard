@@ -1,20 +1,23 @@
 import { useState } from "react";
-import { RefundData } from "../../../public/data/RefundData";
-import AdminViewReviewModal from "../../ui/Modal/Review/AdminViewReviewModal";
-import { ReviewType } from "../../types/ReviewType";
 import AdminAllRefundTable from "../../ui/Tables/AdminAllRefundTable";
+import { IRefund } from "../../types";
+import AdminViewRefundModal from "../../ui/Modal/AdminRefund/AdminViewRefundModal";
+import { useGetAllRefundQuery } from "../../redux/features/refund/refundApi";
 
 const AdminAllRefund = () => {
-  const data = RefundData;
   const [page, setPage] = useState(1);
 
   const limit = 12;
+  const { data, isFetching } = useGetAllRefundQuery({ page, limit });
+
+  const totalData = data?.data?.meta?.total;
+  const refunds: IRefund[] = data?.data?.cancellations;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
 
-  const [currentRecord, setCurrentRecord] = useState<ReviewType | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<IRefund | null>(null);
 
-  const showViewUserModal = (record: ReviewType) => {
+  const showViewUserModal = (record: IRefund) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
@@ -36,15 +39,15 @@ const AdminAllRefund = () => {
         </div>
         <div className="mt-5">
           <AdminAllRefundTable
-            data={data}
-            loading={false}
+            data={refunds}
+            loading={isFetching}
             showViewModal={showViewUserModal}
             setPage={setPage}
             page={page}
-            total={data.length}
+            total={totalData}
             limit={limit}
           />
-          <AdminViewReviewModal
+          <AdminViewRefundModal
             isViewModalVisible={isViewModalVisible}
             handleCancel={handleCancel}
             currentRecord={currentRecord}

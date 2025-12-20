@@ -1,6 +1,5 @@
 import IncomeOverview from "../../Components/Dashboard/Overview/IncomeOverview";
 import OverviewCard from "../../Components/Dashboard/Overview/OverviewCards";
-import RecentUser from "../../Components/Dashboard/Overview/RecentUser";
 
 const AdminDashboard = () => {
   return (
@@ -10,9 +9,7 @@ const AdminDashboard = () => {
           <OverviewCard />
           <IncomeOverview />
         </div>
-        <div>
-          <RecentUser />
-        </div>
+        <div>{/* <RecentUser /> */}</div>
       </>
     </div>
   );

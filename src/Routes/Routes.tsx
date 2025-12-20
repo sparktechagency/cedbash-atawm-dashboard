@@ -10,7 +10,7 @@ import { routeGenerator } from "../utils/routesGenerator";
 import { adminPaths } from "./admin.route";
 import ProtectedRoute from "./ProtectedRoute";
 
-//* Auth
+// Auth
 import SignIn from "../pages/Auth/SignIn";
 import ForgotPassword from "../pages/Auth/ForgetPassword";
 import OtpPage from "../pages/Auth/OtpPage";
@@ -28,56 +28,65 @@ function AuthRedirect() {
 
   useEffect(() => {
     if (user && user.role) {
-      navigate(
-        `/${user.role === "super_admin" ? "admin" : "super_admin"}/overview`,
-        {
-          replace: true,
-        }
-      );
+      navigate(`/admin/overview`, { replace: true });
     } else {
       navigate("/sign-in", { replace: true });
     }
   }, [navigate, user]);
 
-  // Optionally display a loading indicator
   return <Loading />;
 }
 
-// Define routes with TypeScript types
+// ✅ Remove "all-admin" from adminPaths when generating general routes
+const adminPathsWithoutAllAdmin = adminPaths.filter(
+  (item) => item.key !== "all-admin"
+);
+
 const router: RouteObject[] = [
   {
     path: "/",
-    index: true, // This applies to the exact path "/"
+    index: true,
     element: <AuthRedirect />,
   },
   {
     path: "/dashboard",
-    index: true, // This applies to the exact path "/"
+    index: true,
     element: <AuthRedirect />,
   },
   {
     path: "/admin",
-    index: true, // This applies to the exact path "/"
+    index: true,
     element: <AuthRedirect />,
   },
+
+  // ✅ Single admin layout route
   {
     path: "admin",
     element: (
-      <ProtectedRoute role="super_admin">
+      <ProtectedRoute allowedRoles={["admin", "super_admin"]}>
         <DashboardLayout />
       </ProtectedRoute>
     ),
-    children: routeGenerator(adminPaths), // Generating child routes dynamically
+    children: [
+      ...routeGenerator(adminPathsWithoutAllAdmin), // ✅ normal pages
+      ...routeGenerator(adminCommonPaths), // ✅ common pages
+
+      // ✅ ONLY super_admin can access this page
+      {
+        path: "all-admin",
+        element: (
+          <ProtectedRoute allowedRoles={["super_admin"]}>
+            {/* This component must match your route file */}
+            {/* adminPaths has element: <AdminAllAdmin /> */}
+            {adminPaths.find((p) => p.key === "all-admin")?.element ?? (
+              <NotFound />
+            )}
+          </ProtectedRoute>
+        ),
+      },
+    ],
   },
-  {
-    path: "admin",
-    element: (
-      <ProtectedRoute role="super_admin">
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
-    children: routeGenerator(adminCommonPaths), // Generating child routes dynamically
-  },
+
   {
     path: "sign-in",
     element: <SignIn />,
@@ -95,12 +104,10 @@ const router: RouteObject[] = [
     element: <UpdatePassword />,
   },
   {
-    path: "*", // Catch-all for undefined routes
+    path: "*",
     element: <NotFound />,
   },
 ];
 
-// Create the router using createBrowserRouter
 const routes = createBrowserRouter(router);
-
 export default routes;

@@ -7,6 +7,7 @@ import withdrawLogo from "/images/dashboard-logo/withdraw.svg";
 import badgeLogo from "/images/dashboard-logo/badge.svg";
 import feedbackLogo from "/images/dashboard-logo/feedback.svg";
 import refundLogo from "/images/dashboard-logo/refund.svg";
+import adminLogo from "/images/dashboard-logo/admin.svg";
 
 //* ------------------IMPORT COMPONENTS------------------
 import AdminDashboard from "../pages/Admin/AdminDashboard";
@@ -20,6 +21,7 @@ import AdminAllBadge from "../pages/Admin/AdminAllBadge";
 import AdminAllCategory from "../pages/Admin/AdminAllCategory";
 import AdminAllVendor from "../pages/Admin/AdminAllVendor";
 import AdminAllVendorRequest from "../pages/Admin/AdminAllVendorRequest";
+import AdminAllAdmin from "../pages/Admin/AdmiAllAdmin";
 
 export const adminPaths = [
   {
@@ -101,5 +103,12 @@ export const adminPaths = [
     key: "refund",
     name: "Refund",
     icon: refundLogo,
+  },
+  {
+    path: "all-admin",
+    element: <AdminAllAdmin />,
+    key: "all-admin",
+    name: "All Admin",
+    icon: adminLogo,
   },
 ];

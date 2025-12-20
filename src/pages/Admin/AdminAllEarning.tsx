@@ -1,8 +1,8 @@
 import { useState } from "react";
-import transactionsData from "../../../public/data/TransationData";
 import TransactionsTable from "../../ui/Tables/TransactionTable";
 import TransactionsViewModal from "../../ui/Modal/Transaction/TransactionsViewModal";
 import { AllImages } from "../../../public/images/AllImages";
+import { useGetAllEarningQuery } from "../../redux/features/earning/earningApi";
 
 const overview = [
   {
@@ -18,9 +18,12 @@ const overview = [
 ];
 
 const AdminAllEarning = () => {
-  const data = transactionsData;
   const [page, setPage] = useState(1);
   const limit = 12;
+  const { data, isFetching } = useGetAllEarningQuery({ page, limit });
+
+  const totalData = data?.data?.meta?.total;
+  const transactions = data?.data?.earning;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [currentRecord, setCurrentRecord] = useState(null);
@@ -35,7 +38,7 @@ const AdminAllEarning = () => {
     setCurrentRecord(null);
   };
   return (
-    <div className=" bg-primary-color rounded-xl ">
+    <div className=" bg-primary-color rounded-xl min-h-[90vh]">
       <div className="my-5 grid grid-cols-2  gap-5">
         {overview.map((item, index) => (
           <div
@@ -58,12 +61,12 @@ const AdminAllEarning = () => {
       </div>
       <div className="mt-5 bg-primary-color rounded-xl ">
         <TransactionsTable
-          data={data}
-          loading={false}
+          data={transactions}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={totalData}
           limit={limit}
         />
         <TransactionsViewModal

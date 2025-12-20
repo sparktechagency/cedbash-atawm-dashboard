@@ -4,15 +4,16 @@ import ReuseTable from "../../utils/ReuseTable";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import { ColumnsType } from "antd/es/table";
+import { formatDate } from "../../utils/dateFormet";
 
 interface AdminVendorRequestTableProps {
   data: any[];
   loading: boolean;
   setPage?: (page: number) => void;
   showViewModal: (record: any) => void;
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
 
 const AdminVendorRequestTable: React.FC<AdminVendorRequestTableProps> = ({
@@ -26,20 +27,16 @@ const AdminVendorRequestTable: React.FC<AdminVendorRequestTableProps> = ({
 }) => {
   const columns: ColumnsType<any> = [
     {
-      title: "#SI",
-      dataIndex: "id",
-      key: "id",
-      width: 60,
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Vendor Name",
-      dataIndex: "vendorName",
-      key: "vendorName",
-    },
-    {
-      title: "Shop Name",
-      dataIndex: "shopName",
-      key: "shopName",
+      dataIndex: "fullName",
+      key: "fullName",
     },
     {
       title: "E-mail",
@@ -48,15 +45,10 @@ const AdminVendorRequestTable: React.FC<AdminVendorRequestTableProps> = ({
     },
     {
       title: "Request Date",
-      dataIndex: "requestDate",
-      key: "requestDate",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (text: string) => formatDate(text),
     },
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-    },
-
     {
       title: "Action",
       key: "action",

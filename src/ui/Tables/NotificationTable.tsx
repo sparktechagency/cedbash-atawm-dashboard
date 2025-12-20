@@ -22,7 +22,9 @@ const NotificationTable: React.FC<NotificationTableProps> = ({
   const columns = [
     {
       title: "#UID",
-      render: (_: unknown, __: unknown, index: number) => index + 1,
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
       key: "_id",
     },
     {

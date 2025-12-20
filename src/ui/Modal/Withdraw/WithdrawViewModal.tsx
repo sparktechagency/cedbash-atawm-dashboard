@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { Modal } from "antd";
+import { ITransaction } from "../../../types";
+import { formatDate } from "../../../utils/dateFormet";
 
 interface WithdrawViewModalProps {
   isViewModalVisible: boolean;
   handleCancel: () => void;
-  currentRecord: any | null;
+  currentRecord: ITransaction | null;
 }
 
 const WithdrawViewModal: React.FC<WithdrawViewModalProps> = ({
@@ -30,48 +32,35 @@ const WithdrawViewModal: React.FC<WithdrawViewModalProps> = ({
         <div className="text-lg text-center font-medium ">
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Vendor name :</div>
-            <div>{currentRecord?.name}</div>
+            <div>{currentRecord?.vendorId?.fullName}</div>
           </div>
           <div className="flex justify-start items-center gap-2 mb-2">
-            <div className="font-bold text-base-color">Transaction ID:</div>
-            <div className="text-justify pt-0">TXN012301</div>
+            <div className="font-bold text-base-color">Vendor Email :</div>
+            <div>{currentRecord?.vendorId?.email}</div>
           </div>
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Date: </div>
-            <div className="text-base-color">2025-12-12</div>
-          </div>
-          <div className="flex justify-start items-center gap-2 mb-2">
-            <div className="font-bold text-base-color">A/C No: </div>
-            <div className="text-base-color">**** **** **** 1234</div>
-          </div>
-
-          <div className="flex justify-start items-center gap-2 mb-2">
-            <div className="font-bold text-base-color">Balance :</div>
-            <div className="text-justify pt-0">$500</div>
+            <div className="text-base-color">
+              {formatDate(currentRecord?.createdAt)}
+            </div>
           </div>
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Amount :</div>
-            <div className="text-justify pt-0">$200</div>
-          </div>
-          <div className="flex justify-start items-center gap-2 mb-2">
-            <div className="font-bold text-base-color">Commission :</div>
-            <div className="text-justify pt-0">$40</div>
+            <div className="text-justify pt-0">${currentRecord?.amount}</div>
           </div>
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Payment Method: :</div>
-            <div className="text-justify pt-0">Card</div>
+            <div className="text-justify pt-0 capitalize">
+              {currentRecord?.paymentMethod}
+            </div>
           </div>
 
           <div className="flex justify-start items-center gap-2 mb-2">
             <div className="font-bold text-base-color">Payment Status::</div>
             <div className="text-justify pt-0">
-              {currentRecord?.Status === "Pending" ? (
-                <span className="text-error-color">
-                  {currentRecord?.Status}
-                </span>
-              ) : (
-                <span className="text-success-color">Completed</span>
-              )}
+              <span className="text-base-color bg-warning-color/10 px-2 py-1 rounded">
+                Pending
+              </span>
             </div>
           </div>
         </div>

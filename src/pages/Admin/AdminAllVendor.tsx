@@ -1,42 +1,52 @@
 import { useState } from "react";
-import { VendorData } from "../../../public/data/VendorData";
 import SearchInput from "../../ui/Form/ReuseSearchInput";
 import BlockModal from "../../ui/Modal/BlockModal";
 import UnblockModal from "../../ui/Modal/UnblockModal";
-import { IUser } from "../../types/userTypes";
 import AdminAllVendorTable from "../../ui/Tables/AdminAllVendorTable";
 import AdminViewVendorModal from "../../ui/Modal/Vendor/AdminViewVendorModal";
 import AdminShowBadgeModal from "../../ui/Modal/Vendor/AdminShowBadgeModal";
+import { IVendorUser } from "../../types";
+import { useGetAllVendorQuery } from "../../redux/features/vendor/vendorApi";
+import { useActionUserMutation } from "../../redux/features/users/usersApi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const AdminAllVendor = () => {
-  const data = VendorData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
-
   const limit = 12;
+
+  const [userAction] = useActionUserMutation();
+
+  const { data, isFetching } = useGetAllVendorQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const allUsers: IVendorUser[] = data?.data?.users;
+  const totalData = data?.data?.meta?.total;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isShowBadgeModal, setIsShowBadgeModal] = useState(false);
   const [isBlockModalVisible, setIsBlockModalVisible] = useState(false);
   const [isUnblockModalVisible, setIsUnblockModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<IUser | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<IVendorUser | null>(null);
 
-  const showViewUserModal = (record: IUser) => {
+  const showViewUserModal = (record: IVendorUser) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
 
-  const showBadgeModal = (record: IUser) => {
+  const showBadgeModal = (record: IVendorUser) => {
     setCurrentRecord(record);
     setIsShowBadgeModal(true);
   };
 
-  const showBlockModal = (record: IUser) => {
+  const showBlockModal = (record: IVendorUser) => {
     setCurrentRecord(record);
     setIsBlockModalVisible(true);
   };
-  const showUnblockModal = (record: IUser) => {
+  const showUnblockModal = (record: IVendorUser) => {
     setCurrentRecord(record);
     setIsUnblockModalVisible(true);
   };
@@ -49,11 +59,29 @@ const AdminAllVendor = () => {
     setCurrentRecord(null);
   };
 
-  const handleBlock = (data: IUser) => {
-    console.log(data);
+  const handleBlock = async (data: IVendorUser) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        params: data?._id,
+      },
+      "Blocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
-  const handleUnblock = (data: IUser) => {
-    console.log(data);
+  const handleUnblock = async (data: IVendorUser) => {
+    const res = await tryCatchWrapper(
+      userAction,
+      {
+        params: data?._id,
+      },
+      "Unblocking..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
   return (
     <div>
@@ -74,14 +102,14 @@ const AdminAllVendor = () => {
         </div>
 
         <AdminAllVendorTable
-          data={data}
-          loading={false}
+          data={allUsers}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showBlockModal={showBlockModal}
           showUnblockModal={showUnblockModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={totalData}
           limit={limit}
         />
         <AdminViewVendorModal

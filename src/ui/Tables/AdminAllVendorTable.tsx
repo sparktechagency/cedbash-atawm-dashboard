@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import ReuseTable from "../../utils/ReuseTable";
-import { Rate, Space, Tag, Tooltip } from "antd";
+import { Rate, Space, Tooltip } from "antd";
 import { MdBlock } from "react-icons/md";
 import { GoEye } from "react-icons/go";
 import { ColumnsType } from "antd/es/table";
+import { formatDate } from "../../utils/dateFormet";
+import { IVendorUser } from "../../types";
+import { CgUnblock } from "react-icons/cg";
 
 interface AdminAllVendorTableProps {
   data: any[];
@@ -13,15 +16,10 @@ interface AdminAllVendorTableProps {
   showViewModal: (record: any) => void;
   showBlockModal: (record: any) => void;
   showUnblockModal: (record: any) => void;
-  page?: number;
-  total?: number;
-  limit?: number;
+  page: number;
+  total: number;
+  limit: number;
 }
-
-const statusColors: Record<string, string> = {
-  active: "green",
-  deactive: "red",
-};
 
 const AdminAllVendorTable: React.FC<AdminAllVendorTableProps> = ({
   data,
@@ -29,22 +27,23 @@ const AdminAllVendorTable: React.FC<AdminAllVendorTableProps> = ({
   setPage,
   showViewModal,
   showBlockModal,
-  // showUnblockModal,
+  showUnblockModal,
   page,
   total,
   limit,
 }) => {
   const columns: ColumnsType<any> = [
     {
-      title: "#SI",
-      dataIndex: "id",
-      key: "id",
-      width: 60,
+      title: "#UID",
+      dataIndex: "_id",
+      render: (_: unknown, __: unknown, index: number) =>
+        page * limit - limit + index + 1,
+      key: "_id",
     },
     {
       title: "Vendor Name",
-      dataIndex: "vendorName",
-      key: "vendorName",
+      dataIndex: "fullName",
+      key: "fullName",
     },
     {
       title: "E-mail",
@@ -53,43 +52,24 @@ const AdminAllVendorTable: React.FC<AdminAllVendorTableProps> = ({
     },
     {
       title: "Join Date",
-      dataIndex: "joinDate",
-      key: "joinDate",
-    },
-    {
-      title: "Status",
-      dataIndex: "status",
-      key: "status",
-      render: (status) => (
-        <Tag
-          className="!text-base"
-          color={statusColors[status]}
-          style={{ textTransform: "capitalize" }}
-        >
-          {status}
-        </Tag>
-      ),
-      filters: [
-        { text: "Active", value: "Active" },
-        { text: "Inactive", value: "Inactive" },
-        { text: "Pending", value: "Pending" },
-      ],
-      onFilter: (value, record) => record.status === value,
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (val) => formatDate(val),
     },
     {
       title: "Rating",
       dataIndex: "rating",
       key: "rating",
-      render: (val) => (
+      render: (_: unknown, record: IVendorUser) => (
         <div>
           <Rate
             allowHalf
             className="!text-secondary-color"
             disabled
-            defaultValue={val}
+            value={record?.averageRating}
           />
-          <span className="ml-2">{val}</span>
-          <span>(5)</span>
+          <span className="ml-2">{record?.averageRating}</span>
+          <span>({record?.totalRatings})</span>
         </div>
       ),
     },
@@ -108,24 +88,27 @@ const AdminAllVendorTable: React.FC<AdminAllVendorTableProps> = ({
                 <GoEye style={{ fontSize: "24px" }} />
               </button>
             </Tooltip>
-            {/* Block User Tooltip */}
-            {/* <Tooltip placement="left" title="Unblock this User">
+            {!record?.isBlocked ? (
+              <Tooltip placement="left" title="Block this User">
+                <button
+                  className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
+                  onClick={() => showBlockModal(record)}
+                >
+                  <MdBlock style={{ fontSize: "24px" }} />
+                </button>
+              </Tooltip>
+            ) : (
+              <Tooltip placement="left" title="Unblock this User">
                 <button
                   className="!p-0 !bg-transparent !border-none !text-base-color cursor-pointer"
                   onClick={() => showUnblockModal(record)}
                 >
                   <CgUnblock style={{ fontSize: "24px" }} />
                 </button>
-              </Tooltip> */}
+              </Tooltip>
+            )}
+            {/* Block User Tooltip */}
 
-            <Tooltip placement="left" title="Block this User">
-              <button
-                className="!p-0 !bg-transparent !border-none !text-error-color cursor-pointer"
-                onClick={() => showBlockModal(record)}
-              >
-                <MdBlock style={{ fontSize: "24px" }} />
-              </button>
-            </Tooltip>
             {/* View Details Tooltip */}
           </Space>
         </>

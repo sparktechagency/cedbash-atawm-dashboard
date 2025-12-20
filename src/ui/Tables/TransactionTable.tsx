@@ -3,6 +3,7 @@ import React from "react";
 import { Space, Tooltip } from "antd";
 import { GoEye } from "react-icons/go";
 import ReuseTable from "../../utils/ReuseTable";
+import { formatDate } from "../../utils/dateFormet";
 
 interface TransactionsTableProps {
   data: any[];
@@ -26,30 +27,42 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
   const columns = [
     {
       title: "#Tr.ID",
-      dataIndex: "id",
+      dataIndex: ["paymentId", "paymentInfo", "stripePaymentIntentId"],
       key: "id",
     },
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
+      title: "User",
+      dataIndex: ["userId", "fullName"],
+      key: "userId",
+    },
+    {
+      title: "Vendor",
+      dataIndex: ["vendorId", "fullName"],
+      key: "vendorId",
     },
     {
       title: "Amount",
-      dataIndex: "amount",
-      key: "amount",
-      render: (val) => `$${val.toFixed(2)}`,
+      dataIndex: "serviceAmount",
+      key: "serviceAmount",
+      render: (val: number) => `$${val.toFixed(2)}`,
     },
     {
       title: "Commission",
-      dataIndex: "commission",
-      key: "commission",
-      render: (val) => `$${val.toFixed(2)}`,
+      dataIndex: "adminAmount",
+      key: "adminAmount",
+      render: (val: number) => `$${val.toFixed(2)}`,
+    },
+    {
+      title: "Vendor Amount",
+      dataIndex: "vendorAmount",
+      key: "vendorAmount",
+      render: (val: number) => `$${val.toFixed(2)}`,
     },
     {
       title: "Date",
-      dataIndex: "date",
-      key: "date",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (val: string) => formatDate(val),
     },
     {
       title: "Action",

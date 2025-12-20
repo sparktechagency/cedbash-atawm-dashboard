@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Modal } from "antd";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import ReuseUpload from "../../Form/ReuseUpload";
 import ReuseButton from "../../Button/ReuseButton";
+import { useAddBadgeMutation } from "../../../redux/features/badge/badgeApi";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
 
 interface AddBadgeProps {
   isAddModalVisible: boolean;
@@ -14,7 +17,32 @@ const AddBadge: React.FC<AddBadgeProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
+  const [addBadge] = useAddBadgeMutation();
 
+  const handleFinish = async (values: any) => {
+    const formData = new FormData();
+
+    const payload = {
+      name: values.name,
+    };
+
+    if (values.image?.[0]?.originFileObj) {
+      formData.append("image", values.image?.[0]?.originFileObj);
+    }
+
+    formData.append("data", JSON.stringify(payload));
+
+    const res = await tryCatchWrapper(
+      addBadge,
+      { body: formData },
+      "Adding Badge..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
+  };
   return (
     <Modal open={isAddModalVisible} onCancel={handleCancel} footer={null}>
       <div className="mt-10">
@@ -23,7 +51,7 @@ const AddBadge: React.FC<AddBadgeProps> = ({
             Add New Badge
           </h1>
         </div>
-        <ReusableForm form={form} handleFinish={() => {}}>
+        <ReusableForm form={form} handleFinish={handleFinish}>
           <ReuseInput
             name="name"
             type="text"

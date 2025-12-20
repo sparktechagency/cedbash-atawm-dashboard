@@ -1,10 +1,11 @@
 import { Modal, Rate } from "antd";
-import { ReviewType } from "../../../types/ReviewType";
+import { IFeedback } from "../../../types";
+import { formatDate } from "../../../utils/dateFormet";
 
 interface AdminViewReviewModalProps {
   isViewModalVisible: boolean;
   handleCancel: () => void;
-  currentRecord: ReviewType | null;
+  currentRecord: IFeedback | null;
 }
 
 const AdminViewReviewModal: React.FC<AdminViewReviewModalProps> = ({
@@ -26,7 +27,7 @@ const AdminViewReviewModal: React.FC<AdminViewReviewModalProps> = ({
             User Feedback
           </h3>
           <p className="text-sm sm:text-base lg:text-lg text-center mt-2">
-            See full details feedback from {currentRecord?.fullName}
+            See full details feedback from {currentRecord?.ratee?.fullName}
           </p>
 
           <div className="mt-5">
@@ -34,22 +35,22 @@ const AdminViewReviewModal: React.FC<AdminViewReviewModalProps> = ({
               <div className="flex items-center gap-2 mb-2">
                 <span className="font-medium">User Name: </span>
                 <span className="text-secondary-color">
-                  {currentRecord?.fullName}
+                  {currentRecord?.ratee?.fullName}
                 </span>
               </div>
 
               <div className="flex items-center  gap-2 mb-2">
                 <span className="font-medium">User Email:</span>
-                <span>{currentRecord?.email}</span>
+                <span>{currentRecord?.ratee?.email}</span>
               </div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="font-medium">Vendor Name: </span>
-                <span className="">{currentRecord?.fullName}</span>
+                <span className="">{currentRecord?.rater?.fullName}</span>
               </div>
 
               <div className="flex items-center  gap-2 mb-2">
                 <span className="font-medium">Vendor Email:</span>
-                <span>{currentRecord?.email}</span>
+                <span>{currentRecord?.rater?.email}</span>
               </div>
 
               <div className="flex items-center  gap-2 mb-2">
@@ -62,13 +63,13 @@ const AdminViewReviewModal: React.FC<AdminViewReviewModalProps> = ({
               <div className="flex items-center  gap-2 mb-2">
                 <span className="font-medium">Date :</span>
                 <span className="text-justify pt-0 ">
-                  {currentRecord?.date}
+                  {formatDate(currentRecord?.createdAt)}
                 </span>
               </div>
               <div className="flex items-start  gap-2 mb-2">
                 <span className="font-medium text-nowrap">Review :</span>
                 <span className="text-justify pt-0 ">
-                  {currentRecord?.review}
+                  {currentRecord?.comment}
                 </span>
               </div>
             </div>

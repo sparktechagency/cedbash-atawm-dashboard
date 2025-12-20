@@ -23,7 +23,8 @@ const DashboardLayout = () => {
   const userRole = useUserData();
   const location = useLocation();
 
-  const defaultUrl = userRole?.role === "super_admin" ? "/admin" : "/";
+  const defaultUrl = "/admin";
+
   const normalizedPath = location.pathname.replace(defaultUrl, "");
 
   const [collapsed, setCollapsed] = useState(false);
@@ -54,22 +55,23 @@ const DashboardLayout = () => {
   }, []);
 
   const activeKeys = getActiveKeys(normalizedPath);
+  // ✅ role
+  const role = userRole?.role;
+
+  // ✅ filter paths for admin (remove All Admin)
+  const filteredAdminPaths =
+    role === "admin"
+      ? adminPaths.filter((item) => item.key !== "all-admin")
+      : adminPaths;
+
   const menuItems =
-    userRole?.role === "super_admin"
-      ? //   ? sidebarItemsGenerator(adminPaths, "super_admin")
-        sidebarItemsGenerator(
-          adminPaths,
-          userRole?.role === "super_admin" ? "admin" : "super_admin"
-        )
+    role === "super_admin" || role === "admin"
+      ? sidebarItemsGenerator(filteredAdminPaths, "admin") // pass real role
       : [];
 
   const otherItems =
-    userRole?.role === "super_admin"
-      ? //   ? sidebarItemsGenerator(adminPaths, "super_admin")
-        sidebarItemsGenerator(
-          adminCommonPaths,
-          userRole?.role === "super_admin" ? "admin" : "super_admin"
-        )
+    role === "super_admin" || role === "admin"
+      ? sidebarItemsGenerator(adminCommonPaths, "admin")
       : [];
 
   otherItems.push({

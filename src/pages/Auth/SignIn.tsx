@@ -45,7 +45,7 @@ const SignIn = () => {
   const userExist = useUserData();
 
   useEffect(() => {
-    if (userExist?.role === "super_admin") {
+    if (userExist?.role === "super_admin" || userExist?.role === "admin") {
       router("/", { replace: true });
     }
   }, [router, userExist]);
@@ -53,29 +53,35 @@ const SignIn = () => {
   const onFinish = async (values: any) => {
     const res = await tryCatchWrapper(login, { body: values }, "Logging In...");
     console.log(res);
-    if (res?.statusCode === 200 && res?.data?.user?.role === "super_admin") {
+
+    const role = res?.data?.user?.role;
+
+    if (
+      res?.statusCode === 200 &&
+      (role === "admin" || role === "super_admin")
+    ) {
       Cookies.set("atawn_dashboard_accessToken", res?.data?.accessToken, {
         path: "/",
         expires: 365,
         secure: false,
       });
+
       Cookies.set("atawn_dashboard_refreshToken", res?.data?.refreshToken, {
         path: "/",
         expires: 365,
         secure: false,
       });
+
       form.resetFields();
       router("/", { replace: true });
-    } else if (
-      res?.statusCode === 200 &&
-      res?.data?.user?.role !== "super_admin"
-    ) {
+    } else if (res?.statusCode === 200) {
       form.resetFields();
       toast.error("Access Denied", {
         duration: 2000,
       });
     }
   };
+
   return (
     <div className="text-base-color min-h-screen flex items-center justify-center">
       <Container>

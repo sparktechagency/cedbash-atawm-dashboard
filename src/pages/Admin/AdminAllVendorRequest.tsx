@@ -1,22 +1,32 @@
 import { useState } from "react";
-import { VendorRequestData } from "../../../public/data/VendorRequestData";
 import SearchInput from "../../ui/Form/ReuseSearchInput";
-import { IUser } from "../../types/userTypes";
 import AdminVendorRequestTable from "../../ui/Tables/AdminVendorRequestTable";
 import AdminVendorRequestModal from "../../ui/Modal/Vendor/AdminVendorRequestModal";
+import { IVendorUser } from "../../types";
+import { useGetAllVendorReqQuery } from "../../redux/features/vendor/vendorApi";
 
 const AdminAllVendorRequest = () => {
-  const data = VendorRequestData;
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
   console.log(searchText);
 
   const limit = 12;
 
-  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<IUser | null>(null);
+  const { data, isFetching } = useGetAllVendorReqQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
 
-  const showViewUserModal = (record: IUser) => {
+  console.log(data);
+
+  const totalData = data?.data?.meta?.total;
+  const vendors: IVendorUser[] = data?.data?.users;
+
+  const [isViewModalVisible, setIsViewModalVisible] = useState(false);
+  const [currentRecord, setCurrentRecord] = useState<IVendorUser | null>(null);
+
+  const showViewUserModal = (record: IVendorUser) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
@@ -45,12 +55,12 @@ const AdminAllVendorRequest = () => {
         </div>
 
         <AdminVendorRequestTable
-          data={data}
-          loading={false}
+          data={vendors}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={totalData}
           limit={limit}
         />
         <AdminVendorRequestModal

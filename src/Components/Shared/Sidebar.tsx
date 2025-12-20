@@ -12,7 +12,7 @@ import logout from "/images/dashboard-logo/logout.svg";
 interface SidebarProps {
   normalizedPath: string;
   collapsed: boolean;
-  userRole: { role: "super_admin" | string } | null;
+  userRole: { role: "super_admin" | "admin" | string } | null;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -24,7 +24,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   // Generate sidebar items for the "super_admin" role
   const menuItems: any[] =
-    userRole?.role === "super_admin"
+    userRole?.role === "super_admin" || userRole?.role === "admin"
       ? sidebarItemsGenerator(adminPaths, userRole?.role)
       : [];
 

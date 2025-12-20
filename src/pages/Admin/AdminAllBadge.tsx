@@ -1,35 +1,40 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import ReuseButton from "../../ui/Button/ReuseButton";
-import { AllImages } from "../../../public/images/AllImages";
 import DeleteModal from "../../ui/Modal/DeleteModal";
 import AddBadge from "../../ui/Modal/AdminBadge/AddBadge";
 import EditBadge from "../../ui/Modal/AdminBadge/EditBadge";
-
-const data = [
-  {
-    id: 1,
-    name: "Level 1",
-    images: AllImages.badge,
-  },
-];
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import {
+  useDeleteBadgeMutation,
+  useGetAllBadgeQuery,
+} from "../../redux/features/badge/badgeApi";
+import Loading from "../../ui/Loading";
+import { IBadge } from "../../types";
+import { getImageUrl } from "../../helpers/config/envConfig";
+import { AllImages } from "../../../public/images/AllImages";
 
 const AdminAllBadge = () => {
+  const serverUrl = getImageUrl();
+  const { data, isFetching } = useGetAllBadgeQuery({});
+
+  const allBadges: IBadge[] = data?.data;
+
+  const [deleteBadge] = useDeleteBadgeMutation({});
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<any | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<IBadge | null>(null);
 
   const showAddModal = () => {
     setIsAddModalVisible(true);
   };
 
-  const showEditModal = (record: any) => {
+  const showEditModal = (record: IBadge) => {
     setCurrentRecord(record);
     setIsEditModalVisible(true);
   };
 
-  const showDeleteModal = (record: any) => {
+  const showDeleteModal = (record: IBadge) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
   };
@@ -41,8 +46,17 @@ const AdminAllBadge = () => {
     setCurrentRecord(null);
   };
 
-  const handleDelete = (data: any) => {
-    console.log(data);
+  const handleDelete = async (data: IBadge) => {
+    const res = await tryCatchWrapper(
+      deleteBadge,
+      {
+        params: data?._id,
+      },
+      "Deleting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
   return (
     <div>
@@ -62,33 +76,45 @@ const AdminAllBadge = () => {
           </div>
         </div>
         <div className="mt-10 flex items-center gap-5 flex-wrap px-5">
-          {data?.map((item) => (
-            <div
-              className="flex flex-col items-center gap-2 bg-[#F5F5F5] p-5 rounded-2xl"
-              key={item.id}
-            >
-              <img src={item.images} alt="Badge" className="w-auto h-auto" />
-              <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-secondary-color">
-                {item.name}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
-                <ReuseButton
-                  variant="outline"
-                  className="!text-base !px-4 !py-3"
-                  onClick={() => showEditModal(item)}
-                >
-                  Edit
-                </ReuseButton>
-                <ReuseButton
-                  variant="error"
-                  className="!text-base !px-4 !py-3"
-                  onClick={() => showDeleteModal(item)}
-                >
-                  Delete
-                </ReuseButton>
+          {isFetching ? (
+            <Loading />
+          ) : (
+            allBadges?.map((item) => (
+              <div
+                className="flex flex-col items-center gap-2 bg-[#F5F5F5] p-5 rounded-2xl"
+                key={item._id}
+              >
+                <img
+                  src={
+                    item.image?.length > 0
+                      ? serverUrl + item.image
+                      : AllImages?.defaultCover
+                  }
+                  alt="Badge"
+                  className="w-20 h-20 object-cover "
+                />
+                <p className="text-lg sm:text-xl lg:text-2xl font-semibold text-secondary-color">
+                  {item?.name}
+                </p>
+                <div className="flex items-center gap-2 mt-2">
+                  <ReuseButton
+                    variant="outline"
+                    className="!text-base !px-4 !py-3"
+                    onClick={() => showEditModal(item)}
+                  >
+                    Edit
+                  </ReuseButton>
+                  <ReuseButton
+                    variant="error"
+                    className="!text-base !px-4 !py-3"
+                    onClick={() => showDeleteModal(item)}
+                  >
+                    Delete
+                  </ReuseButton>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         <AddBadge
           isAddModalVisible={isAddModalVisible}

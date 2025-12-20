@@ -34,7 +34,7 @@ const ForgotPassword = () => {
   const userExist = useUserData();
 
   useEffect(() => {
-    if (userExist?.role === "super_admin") {
+    if (userExist?.role === "super_admin" || userExist?.role === "admin") {
       router("/", { replace: true });
     }
   }, [router, userExist]);

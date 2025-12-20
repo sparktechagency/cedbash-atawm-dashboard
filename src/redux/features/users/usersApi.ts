@@ -16,7 +16,7 @@ const userApi = baseApi.injectEndpoints({
         url: `/admin/block/${req.params}`,
         method: "PATCH",
       }),
-      invalidatesTags: [tagTypes.user],
+      invalidatesTags: [tagTypes.user, tagTypes.allAdmin, tagTypes.vendor],
     }),
   }),
 });

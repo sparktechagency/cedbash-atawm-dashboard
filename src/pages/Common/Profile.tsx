@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EditOutlined } from "@ant-design/icons";
-import { AllImages } from "../../../public/images/AllImages";
 import ReuseButton from "../../ui/Button/ReuseButton";
 import ReusableForm from "../../ui/Form/ReuseForm";
 import ReuseInput from "../../ui/Form/ReuseInput";
+import { useGetProfileQuery } from "../../redux/features/profile/profileApi";
+import { getImageUrl } from "../../helpers/config/envConfig";
+import Loading from "../../ui/Loading";
 
 const inputStructure = [
   {
@@ -17,7 +18,7 @@ const inputStructure = [
     rules: [{ required: true, message: "Email is required" }],
   },
   {
-    name: "userName",
+    name: "fullName",
     type: "text",
     inputType: "text",
     label: "User name",
@@ -27,7 +28,7 @@ const inputStructure = [
     rules: [{ required: true, message: "User name is required" }],
   },
   {
-    name: "contactNumber",
+    name: "phone",
     type: "text",
     inputType: "tel",
     label: "Contact number",
@@ -39,16 +40,21 @@ const inputStructure = [
 ];
 
 const Profile = () => {
-  const user = JSON.parse(localStorage.getItem("user_into") || "null");
-  const profileData = {
-    userName: "James Mitchell",
-    email: "emily@gmail.com",
-    contactNumber: "+99-01846875456",
-  };
+  const serverUrl = getImageUrl();
 
-  const onSubmit = (values: any) => {
-    console.log(values);
-  };
+  const { data, isFetching } = useGetProfileQuery({});
+
+  const profileData = data?.data;
+
+  const profileImage = serverUrl + profileData?.profileImage;
+
+  if (isFetching) {
+    return (
+      <div className="flex items-center justify-center min-h-[90vh]">
+        <Loading />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -66,17 +72,17 @@ const Profile = () => {
             <div className="flex flex-col items-center justify-center gap-5">
               <img
                 className="h-36 w-36 rounded-full border-2 border-secondary-color relative"
-                src={AllImages.profile}
+                src={profileImage}
                 alt=""
               />
-              <p className="text-4xl font-semibold">{profileData.userName}</p>
+              <p className="text-4xl font-semibold">{profileData?.fullName}</p>
             </div>
             <div className="w-full flex justify-end mt-5">
               <ReuseButton
                 className="!px-4"
                 variant="secondary"
                 htmlType="button"
-                url={`/${user?.role}/profile/edit-profile`}
+                url={`/admin/profile/edit-profile`}
               >
                 <div className="flex gap-3">
                   <EditOutlined
@@ -90,7 +96,7 @@ const Profile = () => {
           </div>
           <div className="flex flex-col w-full items-center text-white mt-5">
             <ReusableForm
-              handleFinish={onSubmit}
+              handleFinish={() => {}}
               className="!w-full"
               defaultValues={profileData}
             >

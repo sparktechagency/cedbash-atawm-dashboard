@@ -1,35 +1,48 @@
 import { useState } from "react";
-import { withdrawData } from "../../../public/data/WithdrawData";
 import SearchInput from "../../ui/Form/ReuseSearchInput";
-import { IUser } from "../../types/userTypes";
 import AcceptModal from "../../ui/Modal/AcceptModal";
 import RejectModal from "../../ui/Modal/RejectModal";
 import AdminAllWithdrawTable from "../../ui/Tables/AdminAllWithdrawTable";
 import WithdrawViewModal from "../../ui/Modal/Withdraw/WithdrawViewModal";
+import {
+  useAcceptWithdrawMutation,
+  useGetAllTransactionQuery,
+  useRejectWithdrawMutation,
+} from "../../redux/features/withdraw/withdrawApi";
+import { ITransaction } from "../../types";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const AdminAllWithdraw = () => {
-  const data = withdrawData;
+  const [acceptWithdraw] = useAcceptWithdrawMutation();
+  const [rejectWithdraw] = useRejectWithdrawMutation();
   const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  console.log(searchText);
 
   const limit = 12;
+  const { data, isFetching } = useGetAllTransactionQuery({
+    page,
+    limit,
+    searchTerm: searchText,
+  });
+
+  const totalData = data?.data?.meta?.total;
+  const transactions: ITransaction[] = data?.data?.data;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isRejectModalVisible, setIsRejectModalVisible] = useState(false);
   const [isAcceptModalVisible, setIsAcceptModalVisible] = useState(false);
-  const [currentRecord, setCurrentRecord] = useState<IUser | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<ITransaction | null>(null);
 
-  const showViewUserModal = (record: IUser) => {
+  const showViewUserModal = (record: ITransaction) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
 
-  const showRejectModal = (record: IUser) => {
+  const showRejectModal = (record: ITransaction) => {
     setCurrentRecord(record);
     setIsRejectModalVisible(true);
   };
-  const showAcceptModal = (record: IUser) => {
+  const showAcceptModal = (record: ITransaction) => {
     setCurrentRecord(record);
     setIsAcceptModalVisible(true);
   };
@@ -41,11 +54,29 @@ const AdminAllWithdraw = () => {
     setCurrentRecord(null);
   };
 
-  const handleReject = (data: IUser) => {
-    console.log(data);
+  const handleReject = async (data: ITransaction) => {
+    const res = await tryCatchWrapper(
+      rejectWithdraw,
+      {
+        params: data?._id,
+      },
+      "Rejecting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
-  const handleAccept = (data: IUser) => {
-    console.log(data);
+  const handleAccept = async (data: ITransaction) => {
+    const res = await tryCatchWrapper(
+      acceptWithdraw,
+      {
+        params: data?._id,
+      },
+      "Accepting..."
+    );
+    if (res.statusCode === 200) {
+      handleCancel();
+    }
   };
   return (
     <div>
@@ -66,14 +97,14 @@ const AdminAllWithdraw = () => {
         </div>
 
         <AdminAllWithdrawTable
-          data={data}
-          loading={false}
+          data={transactions}
+          loading={isFetching}
           showViewModal={showViewUserModal}
           showRejectModal={showRejectModal}
           showAcceptModal={showAcceptModal}
           setPage={setPage}
           page={page}
-          total={data.length}
+          total={totalData}
           limit={limit}
         />
         <WithdrawViewModal

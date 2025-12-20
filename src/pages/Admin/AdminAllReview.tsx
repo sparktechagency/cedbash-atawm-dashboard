@@ -1,27 +1,30 @@
 import { useState } from "react";
-import reviewData from "../../../public/data/Review";
 import AdminAllReviewTable from "../../ui/Tables/AdminAllReviewTable";
 import AdminViewReviewModal from "../../ui/Modal/Review/AdminViewReviewModal";
-import { ReviewType } from "../../types/ReviewType";
 import DeleteModal from "../../ui/Modal/DeleteModal";
+import { useGetAllFeedbackQuery } from "../../redux/features/feedback/feedbackApi";
+import { IFeedback } from "../../types";
 
 const AdminAllReview = () => {
-  const data = reviewData;
   const [page, setPage] = useState(1);
-
   const limit = 12;
+
+  const { data, isFetching } = useGetAllFeedbackQuery({ page, limit });
+
+  const totalData = data?.data?.meta?.total;
+  const reviews: IFeedback[] = data?.data?.reviews;
 
   const [isViewModalVisible, setIsViewModalVisible] = useState(false);
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
 
-  const [currentRecord, setCurrentRecord] = useState<ReviewType | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<IFeedback | null>(null);
 
-  const showViewUserModal = (record: ReviewType) => {
+  const showViewUserModal = (record: IFeedback) => {
     setCurrentRecord(record);
     setIsViewModalVisible(true);
   };
 
-  const showDeleteModal = (record: ReviewType) => {
+  const showDeleteModal = (record: IFeedback) => {
     setCurrentRecord(record);
     setIsDeleteModalVisible(true);
   };
@@ -32,7 +35,7 @@ const AdminAllReview = () => {
     setCurrentRecord(null);
   };
 
-  const handleDelete = (data: ReviewType) => {
+  const handleDelete = (data: IFeedback) => {
     console.log(data);
   };
   return (
@@ -47,13 +50,13 @@ const AdminAllReview = () => {
         </div>
         <div className="mt-5">
           <AdminAllReviewTable
-            data={data}
-            loading={false}
+            data={reviews}
+            loading={isFetching}
             showViewModal={showViewUserModal}
             showDeleteModal={showDeleteModal}
             setPage={setPage}
             page={page}
-            total={data.length}
+            total={totalData}
             limit={limit}
           />
           <AdminViewReviewModal
@@ -65,7 +68,7 @@ const AdminAllReview = () => {
             isDeleteModalVisible={isDeleteModalVisible}
             handleCancel={handleCancel}
             currentRecord={currentRecord}
-            handleDelete={() => handleDelete(currentRecord as ReviewType)}
+            handleDelete={() => handleDelete(currentRecord as IFeedback)}
           />
         </div>
       </div>
