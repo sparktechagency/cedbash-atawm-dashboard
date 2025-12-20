@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form, Modal } from "antd";
 import ReusableForm from "../../Form/ReuseForm";
 import ReuseInput from "../../Form/ReuseInput";
 import ReuseUpload from "../../Form/ReuseUpload";
 import ReuseButton from "../../Button/ReuseButton";
+import tryCatchWrapper from "../../../utils/tryCatchWrapper";
+import { useAddCategoryMutation } from "../../../redux/features/category/categoryApi";
 
 interface AddCategoryProps {
   isAddModalVisible: boolean;
@@ -14,6 +17,32 @@ const AddCategory: React.FC<AddCategoryProps> = ({
   handleCancel,
 }) => {
   const [form] = Form.useForm();
+  const [addCategory] = useAddCategoryMutation();
+
+  const handleFinish = async (values: any) => {
+    const formData = new FormData();
+
+    const payload = {
+      categoryName: values.name,
+    };
+
+    if (values.image?.[0]?.originFileObj) {
+      formData.append("image", values.image?.[0]?.originFileObj);
+    }
+
+    formData.append("data", JSON.stringify(payload));
+
+    const res = await tryCatchWrapper(
+      addCategory,
+      { body: formData },
+      "Adding Category..."
+    );
+
+    if (res?.statusCode === 201) {
+      form.resetFields();
+      handleCancel();
+    }
+  };
 
   return (
     <Modal open={isAddModalVisible} onCancel={handleCancel} footer={null}>
@@ -23,7 +52,7 @@ const AddCategory: React.FC<AddCategoryProps> = ({
             Add New Category
           </h1>
         </div>
-        <ReusableForm form={form} handleFinish={() => {}}>
+        <ReusableForm form={form} handleFinish={handleFinish}>
           <ReuseInput
             name="name"
             type="text"

@@ -8,6 +8,7 @@ import updatePass from "./authImages/updatePass.png";
 // Main Images
 
 import profile from "./dummyProfile.jpg";
+import defaultCover from "./default.webp";
 import users from "./users.png";
 
 import earning from "./earning.png";
@@ -31,6 +32,7 @@ import bell from "./icons/bell.png";
 export const AllImages = {
   logo,
   profile,
+  defaultCover,
   users,
   earning,
   vendor,
