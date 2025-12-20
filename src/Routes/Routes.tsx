@@ -19,27 +19,25 @@ import UpdatePassword from "../pages/Auth/UpdatePassword";
 import NotFound from "../ui/NotFound/NotFound";
 import DashboardLayout from "../Components/Layout/DashboardLayout";
 import { adminCommonPaths } from "./admin.common.route";
-
-interface User {
-  email: string;
-  password: string;
-  role: string;
-}
+import useUserData from "../hooks/useUserData";
 
 // eslint-disable-next-line react-refresh/only-export-components
 function AuthRedirect() {
+  const user = useUserData();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const user = JSON.parse(
-      localStorage.getItem("user_into") || "null"
-    ) as User | null;
     if (user && user.role) {
-      navigate(`/${user.role}/dashboard`, { replace: true });
+      navigate(
+        `/${user.role === "super_admin" ? "admin" : "super_admin"}/overview`,
+        {
+          replace: true,
+        }
+      );
     } else {
       navigate("/sign-in", { replace: true });
     }
-  }, [navigate]);
+  }, [navigate, user]);
 
   // Optionally display a loading indicator
   return <Loading />;
@@ -65,7 +63,7 @@ const router: RouteObject[] = [
   {
     path: "admin",
     element: (
-      <ProtectedRoute role="admin">
+      <ProtectedRoute role="super_admin">
         <DashboardLayout />
       </ProtectedRoute>
     ),
@@ -74,7 +72,7 @@ const router: RouteObject[] = [
   {
     path: "admin",
     element: (
-      <ProtectedRoute role="admin">
+      <ProtectedRoute role="super_admin">
         <DashboardLayout />
       </ProtectedRoute>
     ),

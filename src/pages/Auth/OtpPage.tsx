@@ -5,19 +5,53 @@ import OTPInput from "react-otp-input";
 import { useNavigate } from "react-router-dom";
 import Container from "../../ui/Container";
 import ReuseButton from "../../ui/Button/ReuseButton";
+import Cookies from "js-cookie";
+import {
+  useForgetOtpVerifyMutation,
+  useResendForgetOTPMutation,
+} from "../../redux/features/auth/authApi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
 
 const OTPVerify = () => {
+  const [form] = Form.useForm();
   const router = useNavigate();
   const [otp, setOtp] = useState("");
 
-  const handleOTPSubmit = () => {
-    if (otp.length === 6) {
-      console.log("OTP:", otp);
-      if (window?.location?.pathname === "/sign-up/otp-verify") {
-        router("/");
-      } else {
+  const forgottenEmail = JSON.parse(Cookies.get("atawn_forgetEmail") || "null");
+
+  const [otpMatch] = useForgetOtpVerifyMutation();
+  const [resendOtp] = useResendForgetOTPMutation();
+
+  const handleOTPSubmit = async () => {
+    if (otp.length === 4) {
+      const res = await tryCatchWrapper(
+        otpMatch,
+        { body: { otp: otp } },
+        "Verifying..."
+      );
+      if (res?.statusCode === 200) {
+        form.resetFields();
+        Cookies.remove("atawn_dashboard_forgetToken");
+        Cookies.remove("atawn_forgetEmail");
+        Cookies.set("atawn_dashboard_forgetOtpMatchToken", res.data, {
+          path: "/",
+          expires: 1,
+        });
+
+        setOtp("");
         router("/update-password");
       }
+    }
+  };
+
+  const handleResendOtp = async () => {
+    const res = await tryCatchWrapper(resendOtp, {}, "Sending OTP...");
+    console.log(res);
+
+    if (res?.err?.statusCode === 403) {
+      Cookies.remove("atawn_dashboard_forgetToken");
+      Cookies.remove("atawn_forgetEmail");
+      router("/forgot-password");
     }
   };
 
@@ -31,8 +65,8 @@ const OTPVerify = () => {
                 Verify OTP
               </h1>
               <p className="text-xl lg:text-2xl font-medium mb-2 text-base-color/90">
-                Please check your email. We have sent a code to contact
-                @gmail.com
+                Please check your email. We have sent a code to contact{" "}
+                {forgottenEmail}
               </p>
             </div>
 
@@ -48,7 +82,7 @@ const OTPVerify = () => {
                       rounded-lg mr-[10px] sm:mr-[20px] !text-base-color "
                     value={otp}
                     onChange={setOtp}
-                    numInputs={6}
+                    numInputs={4}
                     renderInput={(props) => <input {...props} required />}
                   />
                 </div>
@@ -65,7 +99,10 @@ const OTPVerify = () => {
             </Form>
             <div className="flex justify-center gap-2 py-1 mt-5">
               <p>Didn’t receive code?</p>
-              <p className="!text-secondary-color !underline font-semibold cursor-pointer">
+              <p
+                onClick={handleResendOtp}
+                className="!text-secondary-color !underline font-semibold cursor-pointer"
+              >
                 Click to resend
               </p>
             </div>

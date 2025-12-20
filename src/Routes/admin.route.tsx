@@ -23,9 +23,9 @@ import AdminAllVendorRequest from "../pages/Admin/AdminAllVendorRequest";
 
 export const adminPaths = [
   {
-    path: "dashboard",
+    path: "overview",
     element: <AdminDashboard />,
-    key: "dashboard",
+    key: "overview",
     name: "Dashboard",
     icon: dashboardLogo,
   },

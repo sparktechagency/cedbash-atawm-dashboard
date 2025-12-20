@@ -5,7 +5,10 @@ import Container from "../../ui/Container";
 import ReusableForm from "../../ui/Form/ReuseForm";
 import ReuseInput from "../../ui/Form/ReuseInput";
 import ReuseButton from "../../ui/Button/ReuseButton";
-import { FormInstance } from "antd";
+import { Form, FormInstance } from "antd";
+import { useResetPasswordMutation } from "../../redux/features/auth/authApi";
+import tryCatchWrapper from "../../utils/tryCatchWrapper";
+import Cookies from "js-cookie";
 
 const inputStructure = [
   {
@@ -45,10 +48,25 @@ const inputStructure = [
 ];
 
 const UpdatePassword = () => {
+  const [form] = Form.useForm();
+  const [resetPassword] = useResetPasswordMutation();
   const router = useNavigate();
-  const onFinish = (values: any) => {
-    console.log("Received values of update form:", values);
-    router("/sign-in");
+  const onFinish = async (values: any) => {
+    const data = {
+      newPassword: values.password,
+      confirmPassword: values.confirmPassword,
+    };
+
+    const res = await tryCatchWrapper(
+      resetPassword,
+      { body: data },
+      "Changing Password..."
+    );
+    if (res?.statusCode === 200) {
+      form.resetFields();
+      Cookies.remove("atawn_dashboard_forgetOtpMatchToken");
+      router("/sign-in");
+    }
   };
 
   return (
@@ -58,11 +76,10 @@ const UpdatePassword = () => {
           <div className="w-full sm:w-[70%] lg:w-full mx-auto">
             <div className=" mt-5 mb-8">
               <h1 className="text-3xl lg:text-4xl font-semibold text-base-color mb-5">
-                Verify OTP
+                Reset Password
               </h1>
               <p className="text-xl lg:text-2xl font-medium mb-2 text-base-color/90">
-                Please check your email. We have sent a code to contact
-                @gmail.com
+                Your password must be 8-10 character long.
               </p>
             </div>
 

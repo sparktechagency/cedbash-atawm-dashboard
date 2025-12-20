@@ -16,15 +16,24 @@ import Sider from "antd/es/layout/Sider";
 import Topbar from "../Shared/Topbar";
 import { AllImages } from "../../../public/images/AllImages";
 import { adminCommonPaths } from "../../Routes/admin.common.route";
+import useUserData from "../../hooks/useUserData";
+import Cookies from "js-cookie";
 
 const DashboardLayout = () => {
-  const userRole = JSON.parse(localStorage.getItem("user_into") || "null");
+  const userRole = useUserData();
   const location = useLocation();
 
-  const defaultUrl = userRole?.role === "admin" ? "/admin" : "/";
+  const defaultUrl = userRole?.role === "super_admin" ? "/admin" : "/";
   const normalizedPath = location.pathname.replace(defaultUrl, "");
 
   const [collapsed, setCollapsed] = useState(false);
+
+  const handleLogout = () => {
+    Cookies.remove("atawn_dashboard_accessToken");
+    Cookies.remove("atawn_dashboard_refreshToken");
+    window.location.href = "/sign-in";
+    window.location.reload();
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -46,15 +55,21 @@ const DashboardLayout = () => {
 
   const activeKeys = getActiveKeys(normalizedPath);
   const menuItems =
-    userRole?.role === "admin"
-      ? //   ? sidebarItemsGenerator(adminPaths, "admin")
-        sidebarItemsGenerator(adminPaths, userRole?.role)
+    userRole?.role === "super_admin"
+      ? //   ? sidebarItemsGenerator(adminPaths, "super_admin")
+        sidebarItemsGenerator(
+          adminPaths,
+          userRole?.role === "super_admin" ? "admin" : "super_admin"
+        )
       : [];
 
   const otherItems =
-    userRole?.role === "admin"
-      ? //   ? sidebarItemsGenerator(adminPaths, "admin")
-        sidebarItemsGenerator(adminCommonPaths, userRole?.role)
+    userRole?.role === "super_admin"
+      ? //   ? sidebarItemsGenerator(adminPaths, "super_admin")
+        sidebarItemsGenerator(
+          adminCommonPaths,
+          userRole?.role === "super_admin" ? "admin" : "super_admin"
+        )
       : [];
 
   otherItems.push({
@@ -69,7 +84,7 @@ const DashboardLayout = () => {
       />
     ),
     label: (
-      <div onClick={() => localStorage.removeItem("user_into")}>
+      <div onClick={handleLogout}>
         <NavLink to="/sign-in">Logout</NavLink>
       </div>
     ),
