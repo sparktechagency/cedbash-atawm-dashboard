@@ -1,52 +1,44 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
 } from "recharts";
 
 // Define the structure of each data point in the chart
 interface ChartData {
-  name: string;
-  uv: number;
+  month: string;
+  value: number;
 }
-
-const data: ChartData[] = [
-  { name: "Jan", uv: 80 },
-  { name: "Feb", uv: 70 },
-  { name: "Mar", uv: 50 },
-  { name: "Apr", uv: 60 },
-  { name: "May", uv: 30 },
-  { name: "Jun", uv: 20 },
-  { name: "Jul", uv: 45 },
-  { name: "Aug", uv: 36 },
-  { name: "Sep", uv: 53 },
-  { name: "Oct", uv: 69 },
-  { name: "Nov", uv: 78 },
-  { name: "Dec", uv: 36 },
-];
 
 interface CustomTooltipProps {
   active?: boolean;
   payload?: { payload: ChartData; uv: number }[];
 }
 
-const Bar_Chart: React.FC = () => {
+const Bar_Chart = ({ incomeData }: { incomeData: any }) => {
+  const convertedData = Object.entries(incomeData).map(([key, value]) => ({
+    month: key.charAt(0).toUpperCase() + key.slice(1),
+    value,
+  }));
+
+  console.log(convertedData);
+
   // Custom tooltip to display the information
   const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-white shadow-md p-2 rounded-md border border-gray-300">
           <p className="text-sm font-semibold text-gray-800">
-            {payload[0].payload.name}
+            {payload[0].payload.month}
           </p>
           <p className="text-xs text-gray-600">
             Total Income:{" "}
-            <span className="font-semibold">${payload[0].uv}</span>
+            <span className="font-semibold">${payload[0].payload?.value}</span>
           </p>
         </div>
       );
@@ -61,7 +53,7 @@ const Bar_Chart: React.FC = () => {
     <div className="w-full h-[400px] ">
       <ResponsiveContainer>
         <BarChart
-          data={data}
+          data={convertedData}
           margin={{
             top: 10,
             right: 20,
@@ -71,7 +63,7 @@ const Bar_Chart: React.FC = () => {
           barCategoryGap={30} // Adjust the gap between bars if necessary
         >
           <RechartsTooltip content={<CustomTooltip />} />
-          <XAxis dataKey="name" tick={{ ...tickStyle }} tickMargin={6} />
+          <XAxis dataKey="month" tick={{ ...tickStyle }} tickMargin={6} />
           <YAxis
             tick={{ ...tickStyle }}
             axisLine={{
@@ -82,14 +74,9 @@ const Bar_Chart: React.FC = () => {
             tickMargin={16}
           />
           {/* Add several horizontal black lines using ReferenceLine */}
-          <ReferenceLine y={10} stroke="#A1A1A1" />
-          <ReferenceLine y={20} stroke="#A1A1A1" />
-          <ReferenceLine y={30} stroke="#A1A1A1" />
-          <ReferenceLine y={40} stroke="#A1A1A1" />
-          <ReferenceLine y={50} stroke="#A1A1A1" />
-          <ReferenceLine y={60} stroke="#A1A1A1" />
+
           <Bar
-            dataKey="uv"
+            dataKey="value"
             fill="url(#incomeGradient)" // Bar color
             barSize={25} // Width of each bar
           />

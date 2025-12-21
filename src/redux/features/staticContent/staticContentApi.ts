@@ -3,6 +3,20 @@ import { tagTypes } from "../../tagTypes";
 
 const staticContentApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
+    getDashbaordStatus: builder.query({
+      query: () => ({
+        url: `/dashboard/dashboard-overview`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.staticContent],
+    }),
+    getIncomeOverview: builder.query({
+      query: ({ year }) => ({
+        url: `/dashboard/yearly-income-chart-data?year=${year}`,
+        method: "GET",
+      }),
+      providesTags: [tagTypes.staticContent],
+    }),
     getStaticData: builder.query({
       query: () => ({
         url: `/setting/get-setting`,
@@ -21,5 +35,9 @@ const staticContentApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetStaticDataQuery, useAddStaticDataMutation } =
-  staticContentApi;
+export const {
+  useGetDashbaordStatusQuery,
+  useGetIncomeOverviewQuery,
+  useGetStaticDataQuery,
+  useAddStaticDataMutation,
+} = staticContentApi;

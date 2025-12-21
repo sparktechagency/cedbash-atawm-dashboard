@@ -1,89 +1,37 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { MdArrowBackIos } from "react-icons/md";
 import { AllIcons } from "../../../public/images/AllImages";
-
-const notifications = [
-  {
-    id: "1",
-    activity: "New user has joined in your application.",
-    time: "2:00 PM",
-  },
-  {
-    id: "2",
-    activity: "New user has joined in your application.",
-    time: "2:00 PM",
-  },
-  {
-    id: "3",
-    activity: "New user has joined in your application.",
-    time: "2:00 PM",
-  },
-  {
-    id: "4",
-    activity: "New user has joined in your application.",
-    time: "2:00 PM",
-  },
-  {
-    id: "5",
-    activity: "New user has joined in your application.",
-    time: "2:00 PM",
-  },
-  {
-    id: "6",
-    activity: "New user has joined in your application.",
-    time: "2:00 PM",
-  },
-  {
-    id: "7",
-    activity: "New user has joined in your application.",
-    time: "3:00 PM",
-  },
-  {
-    id: "8",
-    activity: "New user has joined in your application.",
-    time: "3:30 PM",
-  },
-  {
-    id: "9",
-    activity: "New user has joined in your application.",
-    time: "4:00 PM",
-  },
-  {
-    id: "10",
-    activity: "New user has joined in your application.",
-    time: "4:15 PM",
-  },
-  {
-    id: "11",
-    activity: "New user has joined in your application.",
-    time: "5:00 PM",
-  },
-  {
-    id: "12",
-    activity: "New user has joined in your application.",
-    time: "5:30 PM",
-  },
-  {
-    id: "13",
-    activity: "New user has joined in your application.",
-    time: "6:00 PM",
-  },
-  {
-    id: "14",
-    activity: "New user has joined in your application.",
-    time: "6:15 PM",
-  },
-  {
-    id: "15",
-    activity: "New user has joined in your application.",
-
-    time: "6:30 PM",
-  },
-];
+import { useGetNotificationQuery } from "../../redux/features/overview/overviewApi";
+import Loading from "../../ui/Loading";
+import { formatDateTime } from "../../utils/dateFormet";
+import { Pagination } from "antd";
+import { useState } from "react";
 
 const Notifications = () => {
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { data: notification, isFetching: notificationFetching } =
+    useGetNotificationQuery(
+      {
+        page: page,
+        limit,
+      },
+      {
+        refetchOnMountOrArgChange: true,
+      }
+    );
+  console.log(notification);
+  const notificationData = notification?.data?.notification;
+  const total = notification?.data?.meta?.total || [];
+
+  if (notificationFetching) {
+    return <Loading />;
+  }
+
   return (
     <div
-      className=" bg-slate-50  rounded-xl"
+      className=" bg-slate-50  rounded-xl min-h-[85vh] pb-8"
       style={{ boxShadow: "0px 0px 5px  rgba(0, 0, 0, 0.25)" }}
     >
       <div className="flex items-center bg-secondary-color gap-1 py-3 px-5 mb-3 rounded-tl-xl rounded-tr-xl">
@@ -96,26 +44,35 @@ const Notifications = () => {
           All Notifications
         </h1>
       </div>
-      <div className="px-4 sm:px-6 md:px-8 ">
-        {notifications.map((notification) => (
-          <div
-            key={notification.id}
-            className="flex items-center space-x-3 p-2 border-b border-gray-300 last:border-none"
-          >
-            {/* Icon */}
-            <div className=" p-1 bg-[#BFD9FD] rounded-full w-fit">
-              <img src={AllIcons.bell} className="w-7 h-7" alt="" />
+      <div className=" flex flex-col justify-between min-h-[78vh] ">
+        <div className="px-4 sm:px-6 md:px-8 space-y-4 pb-6">
+          {notificationData?.map((notification: any) => (
+            <div
+              className="test-start bg-secondary-color/10 p-4 rounded-xl"
+              key={notification.id}
+            >
+              <div className="flex items-start gap-2">
+                <div className="p-1 bg-[#BFD9FD] rounded-full w-fit h-fit mt-1">
+                  <img src={AllIcons.bell} className="w-5 h-5" alt="" />
+                </div>
+                <div className="flex flex-col items-start">
+                  <p className="text-lg font-semibold">{notification?.title}</p>
+                  <p className="text-gray-400">{notification?.message}</p>
+                  <p className="text-gray-400 text-xs">
+                    {formatDateTime(notification?.createdAt)}
+                  </p>
+                </div>
+              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Notification text */}
-            <div className="flex flex-col">
-              <span className="text-lg font-medium text-gray-700">
-                {notification.activity}
-              </span>
-              <span className="text-sm text-gray-500">{notification.time}</span>
-            </div>
-          </div>
-        ))}
+        <Pagination
+          current={page}
+          total={total}
+          pageSize={limit}
+          onChange={(page) => setPage(page)}
+        />
       </div>
     </div>
   );

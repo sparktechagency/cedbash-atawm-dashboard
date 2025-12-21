@@ -3,7 +3,6 @@ import { BarsOutlined } from "@ant-design/icons";
 import { Dropdown } from "antd";
 import { Link } from "react-router-dom";
 import { AllIcons } from "../../../public/images/AllImages";
-import useUserData from "../../hooks/useUserData";
 import { useGetProfileQuery } from "../../redux/features/profile/profileApi";
 import { getImageUrl } from "../../helpers/config/envConfig";
 import { formatDateTime } from "../../utils/dateFormet";
@@ -23,7 +22,6 @@ const Topbar: React.FC<TopbarProps> = ({ collapsed, setCollapsed }) => {
   const serverUrl = getImageUrl();
   const [open, setOpen] = useState(false);
 
-  const user = useUserData();
   const { data, isFetching } = useGetProfileQuery({});
 
   const profileData = data?.data;
@@ -42,7 +40,7 @@ const Topbar: React.FC<TopbarProps> = ({ collapsed, setCollapsed }) => {
       }
     );
   console.log(notification);
-  const notificationData = notification?.data?.notifications;
+  const notificationData = notification?.data?.notification;
 
   const handleMenuClick = () => {
     setCollapsed(false);
@@ -61,13 +59,14 @@ const Topbar: React.FC<TopbarProps> = ({ collapsed, setCollapsed }) => {
       ) : (
         notificationData?.map((notification: any) => (
           <div className="test-start" key={notification.id}>
-            <div className="flex items-center gap-2">
-              <div className="p-1 bg-[#BFD9FD] rounded-full w-fit h-fit">
+            <div className="flex items-start gap-2">
+              <div className="p-1 bg-[#BFD9FD] rounded-full w-fit h-fit mt-1">
                 <img src={AllIcons.bell} className="w-5 h-5" alt="" />
               </div>
               <div className="flex flex-col items-start">
-                <p>{notification?.message?.text}</p>
-                <p className="text-gray-400">
+                <p>{notification?.title}</p>
+                <p className="text-gray-400 text-sm">{notification?.message}</p>
+                <p className="text-gray-400 text-xs">
                   {formatDateTime(notification?.createdAt)}
                 </p>
               </div>
@@ -76,7 +75,7 @@ const Topbar: React.FC<TopbarProps> = ({ collapsed, setCollapsed }) => {
         ))
       )}
       <Link
-        to={`/${user?.role}/notifications`}
+        to={`/admin/notifications`}
         className="w-2/3 mx-auto !bg-secondary-color !text-primary-color rounded-xl h-8 py-1"
       >
         See More
