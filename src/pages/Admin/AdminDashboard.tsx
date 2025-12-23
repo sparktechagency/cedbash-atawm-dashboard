@@ -5,7 +5,7 @@ const AdminDashboard = () => {
   return (
     <div>
       <>
-        <div className="">
+        <div className="min-h-[88vh] ">
           <OverviewCard />
           <IncomeOverview />
         </div>

@@ -2,26 +2,31 @@ import { useState } from "react";
 import TransactionsTable from "../../ui/Tables/TransactionTable";
 import TransactionsViewModal from "../../ui/Modal/Transaction/TransactionsViewModal";
 import { AllImages } from "../../../public/images/AllImages";
-import { useGetAllEarningQuery } from "../../redux/features/earning/earningApi";
-
-const overview = [
-  {
-    title: "Today Income",
-    amount: "$ 1,000",
-    icon: AllImages.todayIncome,
-  },
-  {
-    title: "Total Income",
-    amount: "$10000",
-    icon: AllImages.totalIncome,
-  },
-];
+import {
+  useGetAllEarningQuery,
+  useGetEarningStatesQuery,
+} from "../../redux/features/earning/earningApi";
 
 const AdminAllEarning = () => {
+  const { data: earningStates, isFetching: isFetchingEarningStates } =
+    useGetEarningStatesQuery({});
+
+  const overview = [
+    {
+      title: "Today Income",
+      amount: `$ ${earningStates?.data?.todayIncome || 0}`,
+      icon: AllImages.todayIncome,
+    },
+    {
+      title: "Total Income",
+      amount: `$ ${earningStates?.data?.totalIncome || 0}`,
+      icon: AllImages.totalIncome,
+    },
+  ];
+
   const [page, setPage] = useState(1);
   const limit = 12;
   const { data, isFetching } = useGetAllEarningQuery({ page, limit });
-
   const totalData = data?.data?.meta?.total;
   const transactions = data?.data?.earning;
 
@@ -53,7 +58,7 @@ const AdminAllEarning = () => {
                 {item.title}
               </p>
               <p className="text-lg sm:text-xl lg:text-2xl font-bold text-[#000000]">
-                {item.amount}
+                {isFetchingEarningStates ? "..." : item.amount}
               </p>
             </div>
           </div>

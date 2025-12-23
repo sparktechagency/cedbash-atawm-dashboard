@@ -1,9 +1,9 @@
 import EditProfile from "../pages/Common/EditProfile";
 import Profile from "../pages/Common/Profile";
-import AboutUs from "../pages/Common/settings/AboutUs";
+// import AboutUs from "../pages/Common/settings/AboutUs";
 import ChangePassword from "../pages/Common/settings/ChangePassword";
 import PrivacyPolicy from "../pages/Common/settings/PrivacyPolicy";
-import Support from "../pages/Common/settings/Support";
+// import Support from "../pages/Common/settings/Support";
 import TermsOfService from "../pages/Common/settings/TermsOfService";
 import profileLogo from "/images/dashboard-logo/profile.svg";
 import settingLogo from "/images/dashboard-logo/setting.svg";
@@ -44,18 +44,18 @@ export const adminCommonPaths = [
         element: <TermsOfService />,
         name: "Terms of Service",
       },
-      {
-        key: "about-us",
-        path: "settings/about-us",
-        element: <AboutUs />,
-        name: "About Us",
-      },
-      {
-        key: "support",
-        path: "settings/support",
-        element: <Support />,
-        name: "Support",
-      },
+      // {
+      //   key: "about-us",
+      //   path: "settings/about-us",
+      //   element: <AboutUs />,
+      //   name: "About Us",
+      // },
+      // {
+      //   key: "support",
+      //   path: "settings/support",
+      //   element: <Support />,
+      //   name: "Support",
+      // },
     ],
   },
 ];

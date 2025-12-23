@@ -20,7 +20,7 @@ const OverviewCard = () => {
           <img src={AllImages.earning} alt="" className="w-7 h-auto" />
         </div>
       ),
-      count: `${data?.data?.totalEarnings || 0}`,
+      count: `${data?.data?.totalEarning || 0}`,
     },
     {
       id: 2,
@@ -58,21 +58,6 @@ const OverviewCard = () => {
   ];
   return (
     <div>
-      <div className="flex items-center gap-3 mb-8 ">
-        <img
-          src={AllImages.profile}
-          alt=""
-          className="w-16 h-16 rounded-full"
-        />
-        <div>
-          <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-secondary-color">
-            Devid Wilson
-          </h3>
-          <p className="text-sm sm:text-base lg:text-lg text-[#535763]">
-            Check your activities in this dashboard.
-          </p>
-        </div>
-      </div>
       <div className="flex flex-col lg:flex-row gap-1 lg:gap-5 mb-5 !text-secondary-color mt-10">
         {/* Company  */}
         {stateData?.map((item) => (
